@@ -1,17 +1,20 @@
-import React, { useEffect, useState } from 'react';
-import { MapContainer, TileLayer, Marker, Popup, useMap, LayersControl } from 'react-leaflet';
+import React, { useEffect, useState} from 'react';
+import {TileLayer, Marker, Popup, useMap, LayersControl } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import 'leaflet-routing-machine/dist/leaflet-routing-machine.css';
 import 'leaflet-routing-machine';
 import { FoodSpot } from '../types';
 import 'leaflet-routing-machine';
+import { MapContainer } from 'react-leaflet';
+
 
 
 interface MapComponentProps {
   userLocation: [number, number] | null;
   foodSpots: FoodSpot[];
   selectedSpot: FoodSpot | null;
+  onDirectionsFound: (distance: number, duration: number) => void;
 }
 
 const RoutingMachine = ({ userLocation, selectedSpot }: { userLocation: [number, number], selectedSpot: FoodSpot }) => {
@@ -70,8 +73,25 @@ const MapComponent: React.FC<MapComponentProps> = ({ userLocation, foodSpots, se
     shadowSize: [41, 41]
   });
 
+  // const handleMapReady = useCallback(() => {
+  //   return {
+  //     handler: (map: L.Map) => {
+  //       setMap(map);
+  //     }
+  //   };
+  // }, []);
+
   return (
-    <MapContainer center={[userLocation[1], userLocation[0]]} zoom={16} style={{ height: '100%', width: '100%' }} whenCreated={setMap}>
+     <MapContainer 
+      center={[userLocation[1], userLocation[0]]} 
+      zoom={16} 
+      style={{ height: '100%', width: '100%' }} 
+      whenReady={() => {
+        return {
+          handler: (map: L.Map) => setMap(map)
+        };
+      }}
+    >
       <LayersControl position="topright">
         <LayersControl.BaseLayer checked name="OpenStreetMap">
           <TileLayer
